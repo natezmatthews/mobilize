@@ -1,9 +1,9 @@
 import { Document, Model } from "mongoose";
 
 export interface Short {
-  short: String;
-  custom: Boolean;
-  arbitrary: String;
+  short: string;
+  custom: boolean;
+  arbitrary: string;
   created: Date;
 }
 

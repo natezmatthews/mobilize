@@ -6,6 +6,8 @@ const port = 5002;
 
 connect();
 
+app.use(express.json())
+
 app.listen(port, () => {
   console.log(`Server started on http://localhost:${port}`);
 });

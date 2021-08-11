@@ -1,0 +1,1 @@
+export const RANDOM_URI_LEN = 7;
