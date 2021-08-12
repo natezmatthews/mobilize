@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { isNull } from "lodash";
+import { countBy, isNull } from "lodash";
 import findOneShortLink from "../helpers/findOneShortLink";
+import isoDateString from "../helpers/isoDateString";
 import isStringAndNotEmpty from "../helpers/isStringAndNotEmpty";
 import { ShortLinkFields } from "../short-link/types";
 
-export default async function redirectShortLink(req: Request, res: Response) {
+export default async function shortLinkStats(req: Request, res: Response) {
   const validParam = isStringAndNotEmpty(req.params["shortPath"]);
   if (!validParam) {
     return res.status(400).json({ error: "Missing valid path" });
@@ -14,7 +15,10 @@ export default async function redirectShortLink(req: Request, res: Response) {
   if (isNull(shortLink)) {
     return res.sendStatus(404);
   }
-  shortLink.visits.push(new Date());
-  await shortLink.save();
-  return res.redirect(shortLink.get(ShortLinkFields.arbitraryUrl));
+  const visits = shortLink.get(ShortLinkFields.visits);
+  return res.status(200).json({
+    createdDate: shortLink.get(ShortLinkFields.createdDate),
+    totalNumberOfVisits: visits.length,
+    visitsEachDay: countBy(visits, isoDateString)
+  });
 }
