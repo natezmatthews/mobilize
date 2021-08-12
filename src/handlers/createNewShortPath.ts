@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
+import createCustomShortPath from "../helpers/createCustomShortPath";
+import createRandomShortPath from "../helpers/createRandomShortPath";
 import isStringAndNotEmpty from "../helpers/isStringAndNotEmpty";
-import createCustomShortPath from "./createCustomShortPath";
-import createRandomShortPath from "./createRandomShortPath";
 
 function sendErrorResponse(res: Response, statusCode: number, message: string) {
   res.status(statusCode).json({ error: message });

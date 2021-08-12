@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
-import { ShortPath } from "./types";
+import { ShortLink } from "./types";
 
-const ShortPathSchema = new Schema<ShortPath>({
+const ShortLinkSchema = new Schema<ShortLink>({
   shortPath: { type: String, index: true },
   arbitraryUrl: { type: String, index: true },
   isCustom: { type: Boolean, required: true },
@@ -13,4 +13,4 @@ const ShortPathSchema = new Schema<ShortPath>({
   visits: [Date]
 });
 
-export default ShortPathSchema;
+export default ShortLinkSchema;

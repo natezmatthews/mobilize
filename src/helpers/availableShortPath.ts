@@ -2,8 +2,8 @@ import * as baseX from "base-x";
 import * as Chance from "chance";
 import { createHash } from "crypto";
 import { MAX_TRIES, RANDOM_URI_LEN } from "../constants";
-import { ShortPathModel } from "../short-path/model";
-import { ShortPathFields } from "../short-path/types";
+import { ShortLinkModel } from "../short-link/model";
+import { ShortLinkFields } from "../short-link/types";
 
 const BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const chance = Chance();
@@ -23,8 +23,8 @@ export default async function availableShortPathString(
 ): Promise<string> {
   let potentialShortPath = fromHash(arbitraryUrl);
   for (let triesCompleted = 0; triesCompleted < MAX_TRIES; triesCompleted++) {
-    const shortPathIsAlreadyInUse = await ShortPathModel.exists({
-      [ShortPathFields.shortPath]: potentialShortPath,
+    const shortPathIsAlreadyInUse = await ShortLinkModel.exists({
+      [ShortLinkFields.shortPath]: potentialShortPath,
     });
     if (shortPathIsAlreadyInUse) {
       potentialShortPath = fromRandomSelection();
