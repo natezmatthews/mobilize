@@ -8,13 +8,13 @@ const BASE62 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 const chance = Chance();
 
 function fromHash(arbitraryUri: string): string {
-    const hashBuffer = createHash('sha256').update(arbitraryUri);
-    const encoded = baseX[BASE62].encode(hashBuffer);
+    const hashBuffer = createHash('sha256').update(arbitraryUri).digest();
+    const encoded = baseX(BASE62).encode(hashBuffer);
     return encoded.slice(0, RANDOM_URI_LEN);
 }
 
 function fromRandomSelection(): string {
-    return chance.string({ pool: BASE62, length: RANDOM_URI_LEN }, )
+    return chance.string({ pool: BASE62, length: RANDOM_URI_LEN })
 }
 
 export default async function shortUri(arbitraryUri: string): Promise<string> {

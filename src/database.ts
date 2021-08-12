@@ -2,7 +2,7 @@ import * as Mongoose from "mongoose";
 let database: Mongoose.Connection;
 
 export function connect(): void {
-  const uri = "mongodb://localhost";
+  const uri = "mongodb://localhost:27017/test";
   if (database) {
     return;
   }

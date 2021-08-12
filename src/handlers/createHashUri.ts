@@ -26,7 +26,7 @@ export default async function createHashUri(arbitraryUri: string): Promise<Opera
         const newShort = new ShortModel({
             custom: false,
             arbitrary: arbitraryUri,
-            short: shortUri(arbitraryUri)
+            short: await shortUri(arbitraryUri)
         })
         const short = await newShort.save();
         return {
