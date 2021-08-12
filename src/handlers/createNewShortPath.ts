@@ -39,7 +39,6 @@ export default async function createNewShortPath(req: Request, res: Response): P
       const { preexisting, shortPath } = await createRandomShortPath(
         arbitraryUrl
       );
-      console.log(shortPath)
       if (preexisting) {
         sendSuccessResponse(
           res,
