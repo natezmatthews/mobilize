@@ -1,21 +1,20 @@
 import * as baseX from "base-x";
 import * as Chance from "chance";
 import { createHash } from "crypto";
-import { MAX_TRIES, RANDOM_URI_LEN } from "../constants";
+import { BASE62, MAX_TRIES, RANDOM_SHORT_PATH_LEN } from "../constants";
 import { ShortLinkModel } from "../short-link/model";
 import { ShortLinkFields } from "../short-link/types";
 
-const BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const chance = Chance();
 
-function fromHash(arbitraryUrl: string): string {
+export function fromHash(arbitraryUrl: string): string {
   const hashBuffer = createHash("sha256").update(arbitraryUrl).digest();
   const encoded = baseX(BASE62).encode(hashBuffer);
-  return encoded.slice(0, RANDOM_URI_LEN);
+  return encoded.slice(0, RANDOM_SHORT_PATH_LEN);
 }
 
-function fromRandomSelection(): string {
-  return chance.string({ pool: BASE62, length: RANDOM_URI_LEN });
+export function fromRandomSelection(): string {
+  return chance.string({ pool: BASE62, length: RANDOM_SHORT_PATH_LEN });
 }
 
 export default async function availableShortPathString(
