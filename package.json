@@ -26,6 +26,7 @@
   "scripts": {
     "start": "node -r ts-node/register ./src/server.ts",
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "db": "brew services start mongodb-community@5.0"
   }
 }

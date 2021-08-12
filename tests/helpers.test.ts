@@ -63,13 +63,36 @@ describe("Finding an available short path", () => {
   (ShortLinkModel as any).exists = jest.fn();
 
   describe("Find an available short path", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
     it("Tries random paths if the hash method does not work, until a retry limit", () => {
       (ShortLinkModel as any).exists.mockReturnValue(Promise.resolve(true));
       const arbitraryUrl = chance.string();
-      
+
       expect(availableShortPath(arbitraryUrl)).rejects.toEqual(
-        new Error(`Did not find an unused short URI withinin ${MAX_TRIES} tries.`)
+        new Error(
+          `Did not find an unused short URI withinin ${MAX_TRIES} tries.`
+        )
       );
+    });
+
+    it("If the short path from the hash does not exist yet, return that", () => {
+      (ShortLinkModel as any).exists.mockResolvedValueOnce(false);
+      const arbitraryUrl = chance.string();
+      const hashUrl = fromHash(arbitraryUrl);
+
+      expect(availableShortPath(arbitraryUrl)).resolves.toEqual(hashUrl);
+    });
+
+    it("If the short path from the hash already exists, return a random one instead", () => {
+      // Say the first try (the hash) is already taken, but the second try (the first random) is not:
+      (ShortLinkModel as any).exists.mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+      const arbitraryUrl = chance.string();
+      const hashUrl = fromHash(arbitraryUrl);
+
+      expect(availableShortPath(arbitraryUrl)).resolves.not.toEqual(hashUrl);
     });
   });
 });
