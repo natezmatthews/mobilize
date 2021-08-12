@@ -1,7 +1,11 @@
 import * as Chance from "chance";
-import { BASE62, RANDOM_SHORT_PATH_LEN } from "../src/constants";
-import { fromHash, fromRandomSelection } from "../src/helpers/availableShortPath";
+import { BASE62, MAX_TRIES, RANDOM_SHORT_PATH_LEN } from "../src/constants";
+import availableShortPath, {
+  fromHash,
+  fromRandomSelection
+} from "../src/helpers/availableShortPath";
 import isStringAndNotEmpty from "../src/helpers/isStringAndNotEmpty";
+import { ShortLinkModel } from "../src/short-link/model";
 const chance = Chance();
 
 describe("Is string and not empty", () => {
@@ -19,34 +23,53 @@ describe("Is string and not empty", () => {
 });
 
 function expectedLengthAndCharacters(shortPath: string) {
-    expect(typeof shortPath).toBe("string");
-    expect(shortPath).toHaveLength(RANDOM_SHORT_PATH_LEN);
-    const stringWithOnlyCharactersFromBase62 = new RegExp(`^[${BASE62}]+$`);
-    expect(shortPath).toEqual(
-        expect.stringMatching(stringWithOnlyCharactersFromBase62)
-    );
+  expect(typeof shortPath).toBe("string");
+  expect(shortPath).toHaveLength(RANDOM_SHORT_PATH_LEN);
+  const stringWithOnlyCharactersFromBase62 = new RegExp(`^[${BASE62}]+$`);
+  expect(shortPath).toEqual(
+    expect.stringMatching(stringWithOnlyCharactersFromBase62)
+  );
 }
 
 describe("Finding an available short path", () => {
   describe("Getting a short path using a hash", () => {
-      it('Should return a string with the expected length and characters', () => {
-        const url = chance.string();
-        const shortPathFromHash = fromHash(url);
-        expectedLengthAndCharacters(shortPathFromHash);
-      });
-    
-      it("The hash should return the same path for the same URL", () => {
-        const url = chance.string();
-        const shortPathFromHash = fromHash(url);
-        const shortPathFromHash2 = fromHash(url);
-        expect(shortPathFromHash).toEqual(shortPathFromHash2);
-      });
-  })
+    it("Should return a string with the expected length and characters", () => {
+      const url = chance.string();
+      const shortPathFromHash = fromHash(url);
+      expectedLengthAndCharacters(shortPathFromHash);
+    });
 
-  describe('Get a short path that is random', () => {
-    it('Should return a string with the expected length and characters', () => {
-        const randomShortPath = fromRandomSelection();
-        expectedLengthAndCharacters(randomShortPath);
-      });
-  })
+    it("The hash should return the same path for the same URL", () => {
+      const url = chance.string();
+      const shortPathFromHash = fromHash(url);
+      const shortPathFromHash2 = fromHash(url);
+      expect(shortPathFromHash).toEqual(shortPathFromHash2);
+    });
+  });
+
+  describe("Get a short path that is random", () => {
+    it("Should return a string with the expected length and characters", () => {
+      const randomShortPath = fromRandomSelection();
+      expectedLengthAndCharacters(randomShortPath);
+    });
+
+    it("Should return a different string each time", () => {
+      const randomShortPath = fromRandomSelection();
+      const randomShortPath2 = fromRandomSelection();
+      expect(randomShortPath).not.toEqual(randomShortPath2);
+    });
+  });
+
+  (ShortLinkModel as any).exists = jest.fn();
+
+  describe("Find an available short path", () => {
+    it("Tries random paths if the hash method does not work, until a retry limit", () => {
+      (ShortLinkModel as any).exists.mockReturnValue(Promise.resolve(true));
+      const arbitraryUrl = chance.string();
+      
+      expect(availableShortPath(arbitraryUrl)).rejects.toEqual(
+        new Error(`Did not find an unused short URI withinin ${MAX_TRIES} tries.`)
+      );
+    });
+  });
 });
