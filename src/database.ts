@@ -2,7 +2,7 @@ import * as Mongoose from "mongoose";
 let database: Mongoose.Connection;
 
 export function connect(): void {
-  const uri = `mongodb://localhost:27017/${process.env.MONGO_DBNAME || 'mobilize_default'}`;
+  const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/mobilize_default";
   if (database) {
     return;
   }

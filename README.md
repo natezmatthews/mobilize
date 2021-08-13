@@ -29,6 +29,9 @@ These are well established testing libraries with good support.
 ##### nodemon
 This speeds up development by restarting your server when your code changes. On everything but the shortest projects the small amount of time little tools like this saves you really adds up and helps you stay focused.
 
+##### lodash
+I lean on Lodash to feel less worried about the frequent JavaScript bug culprits 'null' and 'undefined' (with their isNull and isUndefined) functions, as well as useful data aggregation methods like countBy().
+
 ### What I would do with more time
 - More test coverage, especially of code involving dates, a common cause of bugs
 - Defense against malicious arbitrary URLs

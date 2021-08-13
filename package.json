@@ -1,5 +1,5 @@
 {
-  "name": "mobilize_take_home",
+  "name": "backend-takehome-mobilize",
   "version": "1.0.0",
   "main": "src/server.ts",
   "author": "Nate Matthews",
@@ -30,7 +30,7 @@
     "start": "node -r ts-node/register ./src/server.ts",
     "dev": "nodemon",
     "build": "tsc",
-    "test": "MONGO_DBNAME=test jest",
-    "db": "brew services start mongodb-community@5.0"
+    "test": "MONGODB_URI='mongodb://localhost:27017/test' jest",
+    "local_db_mac": "brew services start mongodb-community@5.0"
   }
 }
