@@ -17,6 +17,6 @@ app.get('/i/:shortPath', redirectShortLink)
 
 app.get('/stats/:shortPath', shortLinkStats)
 
-app.listen(port, () => {
+export const server = app.listen(port, () => {
   console.log(`Server started on http://localhost:${port}`);
 });

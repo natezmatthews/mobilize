@@ -30,7 +30,7 @@
     "start": "node -r ts-node/register ./src/server.ts",
     "dev": "nodemon",
     "build": "tsc",
-    "test": "jest",
+    "test": "MONGO_DBNAME=test jest",
     "db": "brew services start mongodb-community@5.0"
   }
 }
