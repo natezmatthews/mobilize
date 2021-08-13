@@ -1,10 +1,15 @@
 import { Request, Response } from "express";
 import isStringAndNotEmpty from "../helpers/isStringAndNotEmpty";
+import validCustomShortPath from "../helpers/validCustomShortPath";
 import createCustomShortPath from "../services/createCustomShortPath";
 import createRandomShortPath from "../services/createRandomShortPath";
 
-function sendErrorResponse(res: Response, statusCode: number, message: string) {
-  res.status(statusCode).json({ error: message });
+function sendErrorResponse(
+  res: Response,
+  statusCode: number,
+  message: string
+): Response {
+  return res.status(statusCode).json({ error: message });
 }
 
 function sendSuccessResponse(
@@ -12,41 +17,57 @@ function sendSuccessResponse(
   statusCode: number,
   message: string,
   shortPath: string
-) {
-  res.status(statusCode).json({ message, shortPath });
+): Response {
+  return res.status(statusCode).json({ message, shortPath });
 }
 
-export default async function createNewShortPath(req: Request, res: Response): Promise<void> {
+export default async function createNewShortPath(
+  req: Request,
+  res: Response
+): Promise<Response> {
   const { arbitraryUrl, desiredShortPath } = req.body;
   if (isStringAndNotEmpty(arbitraryUrl)) {
     if (isStringAndNotEmpty(desiredShortPath)) {
-      const customUriCreated = await createCustomShortPath(
-        arbitraryUrl,
-        desiredShortPath
-      );
-      if (customUriCreated) {
-        sendSuccessResponse(
-          res,
-          201,
-          "New custom short path created",
+      const isValidCustomShortPath = validCustomShortPath(desiredShortPath);
+      if (isValidCustomShortPath) {
+        const customUriCreated = await createCustomShortPath(
+          arbitraryUrl,
           desiredShortPath
         );
+        if (customUriCreated) {
+          return sendSuccessResponse(
+            res,
+            201,
+            "New custom short path created",
+            desiredShortPath
+          );
+        } else {
+          return sendErrorResponse(
+            res,
+            409,
+            "That short path is already taken"
+          );
+        }
       } else {
-        sendErrorResponse(res, 409, "That short path is already taken");
+        return sendErrorResponse(
+          res,
+          400,
+          "The short path can only contain A-Z, a-z, 0-9, _ or -"
+        );
       }
     } else {
       const { preexisting, shortPath } = await createRandomShortPath(
         arbitraryUrl
       );
       if (preexisting) {
-        sendSuccessResponse(
+        return sendSuccessResponse(
           res,
           409,
           "That URL already has a short path in our system",
           shortPath
         );
       } else {
-        sendSuccessResponse(
+        return sendSuccessResponse(
           res,
           201,
           "New random short path created",
@@ -55,7 +76,7 @@ export default async function createNewShortPath(req: Request, res: Response): P
       }
     }
   } else {
-    sendErrorResponse(
+    return sendErrorResponse(
       res,
       400,
       "Missing required field in JSON body: 'arbitraryUrl'"

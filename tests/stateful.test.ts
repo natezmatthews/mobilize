@@ -1,6 +1,7 @@
 import { Chance } from 'chance';
 import { connection } from 'mongoose';
 import * as request from 'supertest';
+import { BASE62 } from '../src/constants';
 import { server } from '../src/server';
 import { expectedLengthAndCharacters } from './test-helpers/expectedLengthAndCharacters';
 const chance = Chance();
@@ -10,7 +11,7 @@ afterAll(() => {
 })
 
 let randomShortPath: string;
-const firstCustomShortPath = chance.string();
+const firstCustomShortPath = chance.string({ pool: BASE62 + '_-' });
 const secondCustomShortPath = firstCustomShortPath + '_different';
 
 describe('request a new short link', () => {
@@ -53,7 +54,7 @@ describe('request a new short link', () => {
             })
     });
 
-    it('request a different custom short path, and it should work fine even on the same arbitrary URL', () => {
+    it('request a DIFFERENT custom short path, and it should work fine even on the same arbitrary URL', () => {
         return request(server)
             .post('/new')
             .send({
@@ -76,6 +77,19 @@ describe('request a new short link', () => {
             .expect(409)
             .then(response => {
                 expect(response.body.error).toBe("That short path is already taken");
+            });
+    });
+
+    it('request a custom short path with invalid characters and it should fail', () => {
+        return request(server)
+            .post('/new')
+            .send({
+                arbitraryUrl: "http://www.blahblah.com",
+                desiredShortPath: "blah$"
+            })
+            .expect(400)
+            .then(response => {
+                expect(response.body.error).toBe("The short path can only contain A-Z, a-z, 0-9, _ or -");
             });
     });
 })
