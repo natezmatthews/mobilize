@@ -19,6 +19,7 @@ export default async function shortLinkStats(req: Request, res: Response) {
   return res.status(200).json({
     createdDate: shortLink.get(ShortLinkFields.createdDate),
     totalNumberOfVisits: visits.length,
-    visitsEachDay: countBy(visits, isoDateString)
+    // Pull a date string out of the date and count the visits by that
+    visitsEachDay: countBy(visits, isoDateString) 
   });
 }

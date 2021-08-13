@@ -4,21 +4,24 @@ import validCustomShortPath from "../helpers/validCustomShortPath";
 import createCustomShortPath from "../services/createCustomShortPath";
 import createRandomShortPath from "../services/createRandomShortPath";
 
-function sendErrorResponse(
-  res: Response,
-  statusCode: number,
-  message: string
-): Response {
-  return res.status(statusCode).json({ error: message });
-}
-
-function sendSuccessResponse(
-  res: Response,
-  statusCode: number,
-  message: string,
-  shortPath: string
-): Response {
-  return res.status(statusCode).json({ message, shortPath });
+export default async function createNewShortPath(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const { arbitraryUrl, desiredShortPath } = req.body;
+  if (isStringAndNotEmpty(arbitraryUrl)) {
+    if (isStringAndNotEmpty(desiredShortPath)) {
+      return customShortPathCase(res, arbitraryUrl, desiredShortPath);
+    } else {
+      return randomShortPathCase(res, arbitraryUrl);
+    }
+  } else {
+    return sendErrorResponse(
+      res,
+      400,
+      "Missing required field in JSON body: 'arbitraryUrl'"
+    );
+  }
 }
 
 async function customShortPathCase(
@@ -96,22 +99,19 @@ async function randomShortPathCase(
   }
 }
 
-export default async function createNewShortPath(
-  req: Request,
-  res: Response
-): Promise<Response> {
-  const { arbitraryUrl, desiredShortPath } = req.body;
-  if (isStringAndNotEmpty(arbitraryUrl)) {
-    if (isStringAndNotEmpty(desiredShortPath)) {
-      return customShortPathCase(res, arbitraryUrl, desiredShortPath);
-    } else {
-      return randomShortPathCase(res, arbitraryUrl);
-    }
-  } else {
-    return sendErrorResponse(
-      res,
-      400,
-      "Missing required field in JSON body: 'arbitraryUrl'"
-    );
-  }
+function sendErrorResponse(
+  res: Response,
+  statusCode: number,
+  message: string
+): Response {
+  return res.status(statusCode).json({ error: message });
+}
+
+function sendSuccessResponse(
+  res: Response,
+  statusCode: number,
+  message: string,
+  shortPath: string
+): Response {
+  return res.status(statusCode).json({ message, shortPath });
 }

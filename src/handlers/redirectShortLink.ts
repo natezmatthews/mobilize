@@ -14,7 +14,7 @@ export default async function redirectShortLink(req: Request, res: Response) {
   if (isNull(shortLink)) {
     return res.sendStatus(404);
   }
-  shortLink.visits.push(new Date());
+  shortLink.visits.push(new Date()); // Record this visit
   await shortLink.save();
   return res.redirect(shortLink.get(ShortLinkFields.arbitraryUrl));
 }
