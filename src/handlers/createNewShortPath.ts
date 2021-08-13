@@ -21,6 +21,81 @@ function sendSuccessResponse(
   return res.status(statusCode).json({ message, shortPath });
 }
 
+async function customShortPathCase(
+  res: Response,
+  arbitraryUrl: string,
+  desiredShortPath: string
+): Promise<Response> {
+  const isValidCustomShortPath = validCustomShortPath(desiredShortPath);
+  if (isValidCustomShortPath) {
+    let customUriCreated: Boolean;
+    try {
+      customUriCreated = await createCustomShortPath(
+        arbitraryUrl,
+        desiredShortPath
+      );
+    } catch (error) {
+      console.error(error);
+      return sendErrorResponse(
+        res,
+        500,
+        "Unknown error when creating custom short path"
+      );
+    }
+    if (customUriCreated) {
+      return sendSuccessResponse(
+        res,
+        201,
+        "New custom short path created",
+        desiredShortPath
+      );
+    } else {
+      return sendErrorResponse(res, 409, "That short path is already taken");
+    }
+  } else {
+    return sendErrorResponse(
+      res,
+      400,
+      "The short path can only contain A-Z, a-z, 0-9, _ or -"
+    );
+  }
+}
+
+async function randomShortPathCase(
+  res: Response,
+  arbitraryUrl: string
+): Promise<Response> {
+  let preexisting: Boolean;
+  let shortPath: string;
+  try {
+    const result = await createRandomShortPath(arbitraryUrl);
+    preexisting = result.preexisting;
+    shortPath = result.shortPath;
+  } catch (error) {
+    console.error(error);
+    return sendErrorResponse(
+      res,
+      500,
+      "Unknown error when creating random short path"
+    );
+  }
+  if (preexisting) {
+    return sendSuccessResponse(
+      res,
+      409,
+      "That URL already has a short path in our system",
+      shortPath
+    );
+  } else {
+    return sendSuccessResponse(
+      res,
+      201,
+      "New random short path created",
+      shortPath
+    );
+  }
+}
+
 export default async function createNewShortPath(
   req: Request,
   res: Response
@@ -28,52 +103,9 @@ export default async function createNewShortPath(
   const { arbitraryUrl, desiredShortPath } = req.body;
   if (isStringAndNotEmpty(arbitraryUrl)) {
     if (isStringAndNotEmpty(desiredShortPath)) {
-      const isValidCustomShortPath = validCustomShortPath(desiredShortPath);
-      if (isValidCustomShortPath) {
-        const customUriCreated = await createCustomShortPath(
-          arbitraryUrl,
-          desiredShortPath
-        );
-        if (customUriCreated) {
-          return sendSuccessResponse(
-            res,
-            201,
-            "New custom short path created",
-            desiredShortPath
-          );
-        } else {
-          return sendErrorResponse(
-            res,
-            409,
-            "That short path is already taken"
-          );
-        }
-      } else {
-        return sendErrorResponse(
-          res,
-          400,
-          "The short path can only contain A-Z, a-z, 0-9, _ or -"
-        );
-      }
+      return customShortPathCase(res, arbitraryUrl, desiredShortPath);
     } else {
-      const { preexisting, shortPath } = await createRandomShortPath(
-        arbitraryUrl
-      );
-      if (preexisting) {
-        return sendSuccessResponse(
-          res,
-          409,
-          "That URL already has a short path in our system",
-          shortPath
-        );
-      } else {
-        return sendSuccessResponse(
-          res,
-          201,
-          "New random short path created",
-          shortPath
-        );
-      }
+      return randomShortPathCase(res, arbitraryUrl);
     }
   } else {
     return sendErrorResponse(
