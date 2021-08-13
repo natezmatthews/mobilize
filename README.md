@@ -1,5 +1,11 @@
 # Mobilize Take Home Problem: Backend
 
+## Running the app
+### Requirements
+Developed with:
+- node v16.6.1
+- yarn v1.22.11
+
 ## Design considerations
 ### Assigning short link path via hash
 Using characters A-Z, a-z, and 0-9 for the random URL gives us 62 characters to choose from, and using 7 characters as the length of the path means we have 62^7 ≈ 3.5 trillion URLs available. If our service becomes popular enough that many of those URLs are taken, a random assignment of URLs will eventually lead to more and more "collisions" where the randomly picked URL is not available and our service takes longer to respond.

@@ -5,7 +5,7 @@ import redirectShortLink from "./handlers/redirectShortLink";
 import shortLinkStats from "./handlers/shortLinkStats";
 
 const app = express();
-const port = 5002;
+const port = process.env.PORT || 5002;
 
 connect();
 
@@ -18,5 +18,5 @@ app.get('/i/:shortPath', redirectShortLink)
 app.get('/stats/:shortPath', shortLinkStats)
 
 export const server = app.listen(port, () => {
-  console.log(`Server started on http://localhost:${port}`);
+  console.log(`Server started at ${port}`);
 });
