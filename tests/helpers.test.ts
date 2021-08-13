@@ -1,11 +1,12 @@
 import * as Chance from "chance";
-import { BASE62, MAX_TRIES, RANDOM_SHORT_PATH_LEN } from "../src/constants";
+import { MAX_TRIES } from "../src/constants";
 import availableShortPath, {
   fromHash,
   fromRandomSelection
 } from "../src/helpers/availableShortPath";
 import isStringAndNotEmpty from "../src/helpers/isStringAndNotEmpty";
 import { ShortLinkModel } from "../src/short-link/model";
+import { expectedLengthAndCharacters } from "./test-helpers/expectedLengthAndCharacters";
 const chance = Chance();
 
 describe("Is string and not empty", () => {
@@ -21,15 +22,6 @@ describe("Is string and not empty", () => {
     expect(isStringAndNotEmpty("blah")).toBe(true);
   });
 });
-
-function expectedLengthAndCharacters(shortPath: string) {
-  expect(typeof shortPath).toBe("string");
-  expect(shortPath).toHaveLength(RANDOM_SHORT_PATH_LEN);
-  const stringWithOnlyCharactersFromBase62 = new RegExp(`^[${BASE62}]+$`);
-  expect(shortPath).toEqual(
-    expect.stringMatching(stringWithOnlyCharactersFromBase62)
-  );
-}
 
 describe("Finding an available short path", () => {
   describe("Getting a short path using a hash", () => {

@@ -14,7 +14,6 @@ function sendSuccessResponse(
   shortPath: string
 ) {
   res.status(statusCode).json({ message, shortPath });
-  console.log(shortPath);
 }
 
 export default async function createNewShortPath(req: Request, res: Response): Promise<void> {
